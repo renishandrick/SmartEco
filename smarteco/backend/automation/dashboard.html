@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartEco+ Digital Twin - Campus Monitoring</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🌟 SmartEco+ Digital Twin</h1>
+                <p class="tagline">AI-Powered Smart Campus Resource Management</p>
+            </div>
+            <div class="connection-status">
+                <div class="status-indicator" id="connectionStatus">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Connecting...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Metrics Dashboard -->
+        <section class="metrics-section">
+            <h2>💧 Resource Savings</h2>
+            <div class="metrics-grid">
+                <div class="metric-card water">
+                    <div class="metric-icon">💧</div>
+                    <div class="metric-content">
+                        <div class="metric-label">Water Saved</div>
+                        <div class="metric-value" id="waterSaved">0</div>
+                        <div class="metric-unit">Liters</div>
+                    </div>
+                </div>
+
+                <div class="metric-card energy">
+                    <div class="metric-icon">⚡</div>
+                    <div class="metric-content">
+                        <div class="metric-label">Energy Saved</div>
+                        <div class="metric-value" id="energySaved">0</div>
+                        <div class="metric-unit">kWh</div>
+                    </div>
+                </div>
+
+                <div class="metric-card waste">
+                    <div class="metric-icon">🗑️</div>
+                    <div class="metric-content">
+                        <div class="metric-label">Waste Reduced</div>
+                        <div class="metric-value" id="wasteReduced">0</div>
+                        <div class="metric-unit">%</div>
+                    </div>
+                </div>
+
+                <div class="metric-card fixes">
+                    <div class="metric-icon">🤖</div>
+                    <div class="metric-content">
+                        <div class="metric-label">Auto-Fixes</div>
+                        <div class="metric-value" id="totalFixes">0</div>
+                        <div class="metric-unit">Actions</div>
+                    </div>
+                </div>
+
+                <div class="metric-card carbon">
+                    <div class="metric-icon">🌍</div>
+                    <div class="metric-content">
+                        <div class="metric-label">CO₂ Saved</div>
+                        <div class="metric-value" id="carbonSaved">0</div>
+                        <div class="metric-unit" id="carbonUnit">kg (≈ 0 trees)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Campus Map -->
+        <section class="campus-section">
+            <h2>🏫 Campus Digital Twin</h2>
+            <div class="campus-map-container">
+                <canvas id="campusMap" width="1200" height="600"></canvas>
+            </div>
+        </section>
+
+        <!-- Live Sensors -->
+        <section class="sensors-section">
+            <h2>📊 Live Sensor Data</h2>
+            <div class="sensors-grid" id="sensorsGrid">
+                <!-- Sensor cards will be dynamically generated -->
+            </div>
+        </section>
+
+        <!-- Alerts Feed -->
+        <section class="alerts-section">
+            <h2>🚨 Real-Time Alerts</h2>
+            <div class="alerts-container" id="alertsContainer">
+                <div class="alert-placeholder">Waiting for alerts...</div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Alert Modal -->
+    <div class="alert-modal" id="alertModal">
+        <div class="alert-modal-content">
+            <div class="alert-modal-icon">⚠️</div>
+            <div class="alert-modal-title" id="alertModalTitle">Anomaly Detected</div>
+            <div class="alert-modal-message" id="alertModalMessage"></div>
+            <div class="alert-modal-action" id="alertModalAction">🤖 AUTO-FIX TRIGGERED</div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+
+</html>
