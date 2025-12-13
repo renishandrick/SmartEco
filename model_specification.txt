@@ -1,0 +1,16 @@
+FROZEN CONTRACT
+==============
+INPUT FEATURES (3 columns):
+1. hour (0-23)
+2. day_of_week (0-6, 0=Monday)
+3. occupancy (0.0-1.0)
+
+OUTPUT FORMAT:
+24-point forecast: [{"h":0,"y":value}, {"h":1,"y":value}, ...]
+
+FILES DELIVERED:
+- forecast_electricity.pkl
+- forecast_water.pkl
+- forecast_waste.pkl
+- forecast_backup_*.json (3 files)
+- sample_data.csv

@@ -19,7 +19,8 @@ This system simulates:
 - 📊 **Virtual Sensors** (Water flow, Energy consumption, Waste levels)
 - 🤖 **AI Detection** (Isolation Forest for anomalies, Linear Regression for predictions)
 - ⚡ **Auto-Fix Actions** (Valve control, Circuit isolation, Waste compression)
-- 💰 **Resource Savings** (Track liters, kWh, and waste reduction)
+- 💰 **Resource Savings** (Track liters, kWh, waste reduction, and CO₂)
+- 🌍 **Carbon Footprint** (Calculate environmental impact in real-time)
 
 ---
 
@@ -49,14 +50,19 @@ That's it! The system is now running and simulating the entire campus.
 
 ```
 automation/
-├── api_server.py              # Flask API + WebSocket server
-├── digital_twin_engine.py     # Simulation engine (sensors, locations)
-├── digital_twin.py            # AI detection system (ML models)
-├── dashboard.html             # Web dashboard (UI)
-├── dashboard.css              # Styling (dark mode, animations)
-├── dashboard.js               # Frontend logic (WebSocket, Canvas)
-├── requirements.txt           # Python dependencies
-└── README.md                  # This file
+├── api_server.py                  # Flask API + WebSocket server
+├── digital_twin_engine.py         # Simulation engine (sensors, locations)
+├── digital_twin.py                # AI detection system (ML models)
+├── dashboard.html                 # Web dashboard (UI)
+├── dashboard.css                  # Styling (dark mode, animations)
+├── dashboard.js                   # Frontend logic (WebSocket, Canvas)
+├── requirements.txt               # Python dependencies
+├── README.md                      # This file
+├── QUICK_START.md                 # Fast setup guide
+├── AI_MODEL_GUIDE.md              # AI model documentation
+├── PRACTICAL_IMPLEMENTATION.md    # Real-world deployment plan
+├── CARBON_FOOTPRINT_FEATURE.md    # Carbon footprint documentation
+└── FEATURES_TO_ADD.md             # Additional features guide
 ```
 
 ---
@@ -76,79 +82,39 @@ GET /api/campus/state
 ```
 Returns complete campus state with all locations and sensors.
 
+#### Get Metrics (Including Carbon Footprint)
+```http
+GET /api/metrics
+```
+Returns campus metrics, AI stats, and carbon footprint data.
+
 **Response:**
 ```json
 {
   "success": true,
   "data": {
-    "timestamp": "2025-12-12T22:00:00",
-    "locations": {
-      "hostel_1": {
-        "location_id": "hostel_1",
-        "name": "Hostel Block A",
-        "type": "hostel",
-        "sensors": {
-          "energy": {
-            "value": 245.3,
-            "unit": "W",
-            "status": "normal",
-            "threshold": 450
-          },
-          "water": {...},
-          "waste": {...}
-        }
-      }
-    },
-    "metrics": {
+    "campus_metrics": {
       "water_saved_liters": 125.5,
       "energy_saved_kwh": 2.3,
       "waste_reduced_percent": 15.2,
       "total_fixes": 8
+    },
+    "ai_stats": { ... },
+    "carbon_footprint": {
+      "total_co2_saved_kg": 15.3,
+      "trees_equivalent": 0.73
     }
   }
 }
 ```
 
-#### Get Specific Location
-```http
-GET /api/location/{location_id}
-```
-
-#### Get Metrics
-```http
-GET /api/metrics
-```
-
-#### Get Alerts
-```http
-GET /api/alerts?limit=10
-```
-
-#### Get AI Insights
-```http
-GET /api/insights/{location_id}/{sensor_type}
-```
-
-#### Simulate Anomaly (Testing)
-```http
-POST /api/simulate/anomaly
-Content-Type: application/json
-
-{
-  "location_id": "washroom_2",
-  "sensor_type": "water"
-}
-```
-
-#### Get All Locations
-```http
-GET /api/locations
-```
-
-#### Health Check
-```http
-GET /api/health
-```
+#### Other Endpoints
+- `GET /api/location/{location_id}` - Get specific location
+- `GET /api/alerts?limit=10` - Get recent alerts
+- `GET /api/locations` - Get all locations
+- `GET /api/insights/{location_id}/{sensor_type}` - Get AI insights
+- `POST /api/simulate/anomaly` - Trigger test anomaly
+- `GET /api/health` - Health check
 
 ### WebSocket Events
 
@@ -160,9 +126,6 @@ Connect to: `ws://localhost:5000`
 - `fix_completed` - Auto-fix completed successfully
 - `connection_established` - Initial connection confirmation
 
-**Events You Can Emit:**
-- `request_campus_state` - Request current campus state
-
 ---
 
 ## 🎨 Dashboard Features
@@ -172,6 +135,7 @@ Connect to: `ws://localhost:5000`
 - ⚡ Energy Saved (kWh)
 - 🗑️ Waste Reduced (%)
 - 🤖 Total Auto-Fixes
+- 🌍 CO₂ Saved (kg & tree equivalents)
 
 ### 2. **Interactive Campus Map**
 - Visual representation of all locations
@@ -189,18 +153,13 @@ Connect to: `ws://localhost:5000`
 - Auto-fix action logs
 - Timestamp tracking
 
-### 5. **Alert Modals**
-- Prominent anomaly alerts
-- Auto-fix trigger notifications
-- Visual feedback
-
 ---
 
 ## 🤖 AI System Explained
 
 ### Anomaly Detection (Isolation Forest)
 - **What it does**: Learns normal patterns and detects outliers
-- **How it works**: Trains on last 100 data points, identifies anomalies with 90% confidence
+- **How it works**: Trains on last 100 data points, identifies anomalies with confidence scoring
 - **When it triggers**: When current value is statistically abnormal
 
 ### Predictive Analytics (Linear Regression)
@@ -220,51 +179,21 @@ elif predicted_value > threshold:
 
 ---
 
-## 🔗 Integration with React Frontend
+## 🌍 Carbon Footprint Feature
 
-Your teammates can integrate with this backend easily:
+The system calculates environmental impact in real-time:
 
-### 1. Install Socket.IO Client
-```bash
-npm install socket.io-client
+- **Water:** 0.001 kg CO₂ per liter saved
+- **Energy:** 0.82 kg CO₂ per kWh saved (India grid)
+- **Waste:** 0.5 kg CO₂ per kg waste reduced
+- **Trees:** Total CO₂ ÷ 21 (1 tree absorbs ~21 kg/year)
+
+**Example Output:**
+```
+🌍 CO₂ Saved: 15.3 kg (≈ 0.7 trees)
 ```
 
-### 2. Connect to API
-```javascript
-import io from 'socket.io-client';
-
-// Connect to WebSocket
-const socket = io('http://localhost:5000');
-
-// Listen for updates
-socket.on('campus_update', (data) => {
-  // Update React state
-  setCampusData(data);
-});
-
-socket.on('alert', (alert) => {
-  // Show notification
-  showNotification(alert);
-});
-
-// Fetch initial data
-fetch('http://localhost:5000/api/campus/state')
-  .then(res => res.json())
-  .then(data => setCampusData(data.data));
-```
-
-### 3. Use the Data
-```javascript
-// Example: Display sensor data
-{campusData.locations.map(location => (
-  <SensorCard 
-    key={location.location_id}
-    name={location.name}
-    sensors={location.sensors}
-    status={location.auto_fix_active ? 'fixing' : 'normal'}
-  />
-))}
-```
+See `CARBON_FOOTPRINT_FEATURE.md` for details.
 
 ---
 
@@ -276,37 +205,38 @@ fetch('http://localhost:5000/api/campus/state')
 ### Live Demo (2 minutes)
 
 1. **Show Dashboard**
-   - "Here's our campus with 9 locations - hostels, classrooms, labs, washrooms, and canteen."
-   - "Each location has virtual sensors monitoring water, energy, and waste."
+   - "Here's our campus with 9 locations monitoring water, energy, and waste."
+   - "Notice the carbon footprint tracker - we're saving CO₂ in real-time."
 
 2. **Trigger Anomaly** (in browser console)
    ```javascript
    triggerTestAnomaly()
    ```
-   - "Watch this - I'm simulating a water leak in Washroom-2..."
+   - "Watch - I'm simulating a water leak..."
    - **[Alert appears]**
-   - "The AI detected the anomaly and automatically closed the solenoid valve!"
-   - **[Show metrics increasing]**
-   - "And you can see the water saved counter increasing in real-time."
+   - "The AI detected it and automatically closed the valve!"
+   - **[Metrics increase]**
 
 3. **Show AI Intelligence**
-   - "The system uses Isolation Forest for anomaly detection and Linear Regression for predictive analytics."
-   - "It doesn't just react - it predicts future wastage and prevents it."
+   - "We use Isolation Forest and Linear Regression - real machine learning, not just thresholds."
+   - "It predicts problems before they happen."
 
 ### Impact (30 seconds)
-> "In a real deployment, this system could save thousands of liters of water, kilowatts of energy, and reduce waste - all automatically, 24/7, without human intervention. It's scalable to any campus, building, or smart city."
+> "In a real deployment, this could save thousands of liters, kilowatts, and reduce carbon emissions - all automatically, 24/7. It's scalable to any campus or smart city."
 
 ---
 
 ## 🏆 Why This Wins Hackathons
 
 ✅ **Visually Impressive** - Real-time dashboard with animations  
-✅ **AI-Powered** - Uses actual ML models (not just thresholds)  
+✅ **AI-Powered** - Uses actual ML models (Isolation Forest + Linear Regression)  
 ✅ **Complete System** - Backend + Frontend + AI + Visualization  
 ✅ **Practical Impact** - Solves real sustainability problem  
+✅ **Environmental Focus** - Carbon footprint tracking  
 ✅ **Scalable** - Can expand to entire cities  
 ✅ **No Hardware** - Works on just a laptop  
-✅ **Well-Documented** - Easy for judges to understand  
+✅ **Well-Documented** - 8+ comprehensive guides  
+✅ **Production-Ready** - Detailed implementation plan included
 
 ---
 
@@ -315,28 +245,41 @@ fetch('http://localhost:5000/api/campus/state')
 - **Backend**: Flask with REST API + WebSocket
 - **AI/ML**: scikit-learn (Isolation Forest, Linear Regression)
 - **Frontend**: Vanilla JavaScript with Canvas API
-- **Real-time**: Socket.IO for live updates
+- **Real-time**: Socket.IO for live updates (1-second intervals)
 - **Simulation**: Time-based patterns with realistic variations
 - **Auto-Fix**: Simulated hardware control (valves, circuits, compressors)
+- **Sustainability**: Real-time carbon footprint calculation
 
 ---
 
-## 🛠️ Customization
+## 📚 Additional Documentation
 
-### Add New Location
-Edit `digital_twin_engine.py`:
-```python
-campus_layout = [
-    # ... existing locations
-    ('new_location_id', 'location_type', 'Display Name'),
-]
+- **`QUICK_START.md`** - Get running in 3 minutes
+- **`AI_MODEL_GUIDE.md`** - Complete AI model documentation
+- **`PRACTICAL_IMPLEMENTATION.md`** - Real-world deployment plan with costs
+- **`CARBON_FOOTPRINT_FEATURE.md`** - Environmental impact tracking
+- **`REACT_INTEGRATION.md`** - Frontend integration guide
+- **`PROJECT_CHECKLIST.md`** - Complete task list
+- **`FEATURES_TO_ADD.md`** - Enhancement ideas
+
+---
+
+## 🆘 Troubleshooting
+
+**Port already in use?**
+```bash
+netstat -ano | findstr :5000
+taskkill /PID <PID> /F
 ```
 
-### Adjust Thresholds
-Modify sensor thresholds in `CampusLocation` class methods.
+**WebSocket not connecting?**
+- Check if server is running
+- Use http://localhost:5000 (not 127.0.0.1)
+- Clear browser cache
 
-### Change Update Frequency
-In `api_server.py`, modify `time.sleep(1)` in simulation loop.
+**No alerts showing?**
+- Wait 30-60 seconds for AI to collect data
+- Or manually trigger: `triggerTestAnomaly()` in console
 
 ---
 
@@ -351,26 +294,6 @@ MIT License - Feel free to use this for your hackathon!
 Built for hackathons by students who care about sustainability 🌍
 
 **Made with ❤️ and AI**
-
----
-
-## 🆘 Troubleshooting
-
-**Port already in use?**
-```bash
-# Kill process on port 5000
-netstat -ano | findstr :5000
-taskkill /PID <PID> /F
-```
-
-**WebSocket not connecting?**
-- Check if server is running
-- Verify no CORS issues
-- Try http://localhost:5000 instead of 127.0.0.1
-
-**No alerts showing?**
-- Wait 30-60 seconds for AI to collect data
-- Or manually trigger: `POST /api/simulate/anomaly`
 
 ---
 
